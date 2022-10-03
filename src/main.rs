@@ -24,6 +24,8 @@ fn main() {
             if output.is_abort {
                 return;
             }
+            // This indexer should be safe, as they should have always had picked
+            // one option at this point.
             let selected_item = &output.selected_items[0];
             let branch = selected_item.output();
             git_checkout(branch.to_string());
