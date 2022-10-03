@@ -9,6 +9,12 @@ brew tap jharrilim/git-b
 brew install git-b
 ```
 
+## Configure git
+
+```sh
+git config --global alias.b '!git-b'
+```
+
 ## Compiling from Mac to Linux
 
 Due to [rust/issues/34282](https://github.com/rust-lang/rust/issues/34282), you'll need to run this
