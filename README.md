@@ -2,6 +2,8 @@
 
 Fuzzy picker for checking out git branches
 
+![demo.gif](demo.gif)
+
 ## Installation instructions
 
 ### Install on Mac
