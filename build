@@ -9,7 +9,7 @@ mac_intel="x86_64-apple-darwin"
 mac_silicon="aarch64-apple-darwin"
 linux_intel="x86_64-unknown-linux-gnu"
 
-mac_intel_tar="$name-$version-$mac_intel.tar.gz"
+mac_intel_tar="$name-v$version-$mac_intel.tar.gz"
 mac_silicon_tar="$name-v$version-$mac_silicon.tar.gz"
 linux_intel_tar="$name-v$version-$linux_intel.tar.gz"
 
