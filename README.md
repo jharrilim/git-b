@@ -1,6 +1,6 @@
 # git b
 
-Fuzzy picker for git branches
+Fuzzy picker for checking out git branches
 
 ## Installation instructions
 
