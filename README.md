@@ -26,7 +26,14 @@ cd git-b
 cargo install --path .
 ```
 
+## Usage
+
+Anywhere within a project under git source control, you may run `git-b`.
+You may also configure a git alias for it, such as `git b`.
+
 ## Configure git
+
+To configure a `git b` alias, run:
 
 ```sh
 git config --global alias.b '!git-b'
