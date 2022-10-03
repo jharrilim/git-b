@@ -2,6 +2,11 @@ use skim::prelude::*;
 use std::{io::BufReader, process::Command};
 
 fn main() {
+    if std::env::args().any(|arg| arg == "--version") {
+        println!("git-b {}", env!("CARGO_PKG_VERSION"));
+        return;
+    }
+
     let branches = branch_names().join("\n");
     let b = Box::leak(branches.into_boxed_str());
     let reader = BufReader::new(b.as_bytes());

@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+
+set -e
+
+name="git-b"
+version="$1"
+
+mac_intel="x86_64-apple-darwin"
+mac_silicon="aarch64-apple-darwin"
+linux_intel="x86_64-unknown-linux-gnu"
+
+mac_intel_tar="$name-$version-$mac_intel.tar.gz"
+mac_silicon_tar="$name-v$version-$mac_silicon.tar.gz"
+linux_intel_tar="$name-v$version-$linux_intel.tar.gz"
+
+cargo build --target=$mac_intel --release
+cargo build --target=$mac_silicon --release
+CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER=x86_64-unknown-linux-gnu-gcc cargo build --target=$linux_intel --release
+
+cd target/$mac_silicon/release
+tar -czvf "$mac_silicon_tar" $name
+silicon_sha=$(shasum -a 256 "$mac_silicon_tar" | cut -d ' ' -f 1)
+mv "$mac_silicon_tar" ../../../"$mac_silicon_tar"
+
+cd ../../$mac_intel/release
+tar -czvf "$mac_intel_tar" $name
+intel_sha=$(shasum -a 256 "$mac_intel_tar" | cut -d ' ' -f 1)
+mv "$mac_intel_tar" ../../../"$mac_intel_tar"
+
+cd ../../$linux_intel/release
+tar -czvf "$linux_intel_tar" $name
+mv "$linux_intel_tar" ../../../"$linux_intel_tar"
+
+cd ../../../
+
+sed -i '' -e "s|X86_64_SHA\ \=.*|X86_64_SHA = '$intel_sha'|" Formula/git_b.rb
+sed -i '' -e "s|AARCH64_SHA\ \=.*|AARCH64_SHA = '$silicon_sha'|" Formula/git_b.rb
+sed -i '' -e "s|VERSION\ \=.*|VERSION = '$version'|" Formula/git_b.rb
