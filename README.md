@@ -5,7 +5,7 @@ Fuzzy selector for git branches
 ## Install (Mac)
 
 ```sh
-brew tap jharrilim/git-b/git-b
+brew tap jharrilim/git-b
 brew install git-b
 ```
 
