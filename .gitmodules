@@ -1,0 +1,3 @@
+[submodule "Formula"]
+	path = Formula
+	url = https://github.com/jharrilim/homebrew-git-b.git
