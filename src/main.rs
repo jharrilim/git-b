@@ -8,6 +8,9 @@ fn main() {
     }
 
     let branches = branch_names().join("\n");
+
+    // SkimItemReader#of_bufread requires a 'static lifetime on this.
+    // Leaking it prevents it from being destroyed and thus makes it 'static.
     let b = Box::leak(branches.into_boxed_str());
     let reader = BufReader::new(b.as_bytes());
 
