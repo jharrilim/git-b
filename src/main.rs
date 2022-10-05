@@ -1,11 +1,11 @@
+use clap::Parser;
 use skim::prelude::*;
 use std::{io::BufReader, process::Command};
 
+mod cli;
+
 fn main() {
-    if std::env::args().any(|arg| arg == "--version") {
-        println!("git-b {}", env!("CARGO_PKG_VERSION"));
-        return;
-    }
+    let args = cli::Args::parse();
 
     let branches = branch_names().join("\n");
 
@@ -14,7 +14,18 @@ fn main() {
     let b = Box::leak(branches.into_boxed_str());
     let reader = BufReader::new(b.as_bytes());
 
-    let options = SkimOptionsBuilder::default().multi(false).build().unwrap();
+    let options = match args.branch {
+        Some(branch) => {
+            let branch = Box::leak(branch.into_boxed_str());
+
+            SkimOptionsBuilder::default()
+                .multi(false)
+                .query(Some(branch))
+                .build()
+                .unwrap()
+        }
+        None => SkimOptionsBuilder::default().multi(false).build().unwrap(),
+    };
 
     let item_reader = SkimItemReader::default();
     let items = item_reader.of_bufread(reader);
@@ -27,8 +38,16 @@ fn main() {
             // This indexer should be safe, as they should have always had picked
             // one option at this point.
             let selected_item = &output.selected_items[0];
-            let branch = selected_item.output();
-            git_checkout(branch.to_string());
+            let line = selected_item.output();
+            let branch = line.split_whitespace().next();
+            match branch {
+                Some(branch) => {
+                    git_checkout(branch.to_string());
+                }
+                None => {
+                    println!("Branch name invalid, somehow. Report this:\n'{}'", line);
+                }
+            }
         }
         None => {}
     }
@@ -48,6 +67,7 @@ fn branch_names() -> Vec<String> {
     let mut branch_names = Vec::new();
     let output = Command::new("git")
         .arg("branch")
+        .arg("-v")
         .output()
         .expect("failed to execute process");
     let output = String::from_utf8(output.stdout).unwrap();
