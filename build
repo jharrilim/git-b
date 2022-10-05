@@ -33,6 +33,6 @@ mv "$linux_intel_tar" ../../../"$linux_intel_tar"
 
 cd ../../../
 
-sed -i '' -e "s|X86_64_SHA\ \=.*|X86_64_SHA = '$intel_sha'|" Formula/git_b.rb
-sed -i '' -e "s|AARCH64_SHA\ \=.*|AARCH64_SHA = '$silicon_sha'|" Formula/git_b.rb
-sed -i '' -e "s|VERSION\ \=.*|VERSION = '$version'|" Formula/git_b.rb
+sed -i '' -e "s|X86_64_SHA\ \=.*|X86_64_SHA = '$intel_sha'|" Formula/git-b.rb
+sed -i '' -e "s|AARCH64_SHA\ \=.*|AARCH64_SHA = '$silicon_sha'|" Formula/git-b.rb
+sed -i '' -e "s|VERSION\ \=.*|VERSION = '$version'|" Formula/git-b.rb
