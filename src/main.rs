@@ -21,10 +21,11 @@ fn main() {
             SkimOptionsBuilder::default()
                 .multi(false)
                 .query(Some(branch))
+                .nosort(true)
                 .build()
                 .unwrap()
         }
-        None => SkimOptionsBuilder::default().multi(false).build().unwrap(),
+        None => SkimOptionsBuilder::default().multi(false).nosort(true).build().unwrap(),
     };
 
     let item_reader = SkimItemReader::default();
@@ -68,6 +69,7 @@ fn branch_names() -> Vec<String> {
     let output = Command::new("git")
         .arg("branch")
         .arg("-v")
+        .arg("--sort=-committerdate")
         .output()
         .expect("failed to execute process");
     let output = String::from_utf8(output.stdout).unwrap();
