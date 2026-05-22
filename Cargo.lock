@@ -28,7 +28,7 @@ dependencies = [
 
 [[package]]
 name = "algo"
-version = "1.5.0"
+version = "1.6.0"
 dependencies = [
  "display",
  "parse",
@@ -332,7 +332,7 @@ dependencies = [
 
 [[package]]
 name = "cli"
-version = "1.5.0"
+version = "1.6.0"
 dependencies = [
  "clap",
 ]
@@ -602,8 +602,9 @@ dependencies = [
 
 [[package]]
 name = "display"
-version = "1.5.0"
+version = "1.6.0"
 dependencies = [
+ "parse",
  "ratatui",
  "serde",
  "toml",
@@ -892,7 +893,7 @@ checksum = "e629b9b98ef3dd8afe6ca2bd0f89306cec16d43d907889945bc5d6687f2f13c7"
 
 [[package]]
 name = "git-b"
-version = "1.5.0"
+version = "1.6.0"
 dependencies = [
  "algo",
  "clap",
@@ -1382,7 +1383,7 @@ dependencies = [
 
 [[package]]
 name = "parse"
-version = "1.5.0"
+version = "1.6.0"
 
 [[package]]
 name = "pest"

@@ -6,6 +6,7 @@ description = "Display colors for git-b branch picker"
 publish = false
 
 [dependencies]
+parse = { path = "../parse" }
 ratatui = "0.30"
 serde = { version = "1.0", features = ["derive"] }
 toml = "0.8"

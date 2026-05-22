@@ -1,6 +1,6 @@
 use algo::BranchItem;
 use cli::{Args, Parser};
-use display::{load, ColorOverrides};
+use display::{load, ColorOverrides, DisplayLayout};
 use skim::prelude::*;
 use std::process::Command;
 
@@ -37,9 +37,10 @@ fn main() {
         return;
     }
 
+    let layout = DisplayLayout::from_branches(&branches);
     let items: Vec<BranchItem> = branches
         .into_iter()
-        .map(|b| BranchItem::new(b, colors))
+        .map(|b| BranchItem::new(b, layout, colors))
         .collect();
 
     let options = SkimOptionsBuilder::default()

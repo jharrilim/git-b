@@ -3,7 +3,7 @@
 use std::borrow::Cow;
 use std::collections::HashSet;
 
-use display::{colored_line, field_ranges, DisplayColors, FieldRanges, Line};
+use display::{colored_line, DisplayColors, DisplayLayout, FieldRanges, Line};
 use parse::Branch;
 use skim::prelude::*;
 use skim::{DisplayContext, MatchEngine, MatchEngineFactory, Matches, SkimItem};
@@ -28,17 +28,15 @@ pub struct BranchItem {
 }
 
 impl BranchItem {
-    pub fn new(branch: Branch, colors: DisplayColors) -> Self {
-        let display = branch.display_line();
-        let name_end = branch.name.len();
-        let subject_start = name_end + 1 + branch.short_hash.len() + 1;
-        let subject_end = display.len();
-        let field = field_ranges(&branch.name, &branch.short_hash, &branch.subject);
+    pub fn new(branch: Branch, layout: DisplayLayout, colors: DisplayColors) -> Self {
+        let display = layout.format_line(&branch);
+        let matching_ranges = layout.matching_ranges(&display);
+        let field_ranges = layout.field_ranges();
         Self {
             branch,
             display,
-            matching_ranges: [(0, name_end), (subject_start, subject_end)], // byte ranges for skim
-            field_ranges: field, // char ranges for display colors
+            matching_ranges,
+            field_ranges,
             colors,
         }
     }
@@ -50,7 +48,8 @@ impl BranchItem {
 
 impl From<Branch> for BranchItem {
     fn from(branch: Branch) -> Self {
-        Self::new(branch, DisplayColors::default())
+        let layout = DisplayLayout::from_branches(std::slice::from_ref(&branch));
+        Self::new(branch, layout, DisplayColors::default())
     }
 }
 
@@ -173,7 +172,7 @@ pub fn find_first_matching<'a>(query: &str, branches: &'a [Branch]) -> Option<&'
 #[cfg(test)]
 mod tests {
     use super::*;
-    use display::DisplayColors;
+    use display::{DisplayColors, DisplayLayout};
     use parse::Branch;
 
     fn branch(name: &str, subject: &str) -> Branch {
@@ -206,14 +205,18 @@ mod tests {
 
     #[test]
     fn branch_item_output_is_checkout_name() {
-        let item = BranchItem::new(branch("foo/bar", "subject"), DisplayColors::disabled());
+        let b = branch("foo/bar", "subject");
+        let layout = DisplayLayout::from_branches(&[b.clone()]);
+        let item = BranchItem::new(b, layout, DisplayColors::disabled());
         assert_eq!(item.output(), "foo/bar");
         assert_eq!(item.text(), "foo/bar abc1234 subject");
     }
 
     #[test]
     fn branch_item_matching_ranges_name_before_subject() {
-        let item = BranchItem::new(branch("my-branch", "my subject"), DisplayColors::disabled());
+        let b = branch("my-branch", "my subject");
+        let layout = DisplayLayout::from_branches(&[b.clone()]);
+        let item = BranchItem::new(b, layout, DisplayColors::disabled());
         let ranges = item.get_matching_ranges().unwrap();
         assert_eq!(ranges[0], (0, "my-branch".len()));
         assert!(ranges[1].0 > ranges[0].1);
@@ -221,7 +224,9 @@ mod tests {
 
     #[test]
     fn colored_display_when_enabled() {
-        let item = BranchItem::new(branch("main", "init"), DisplayColors::default());
+        let b = branch("main", "init");
+        let layout = DisplayLayout::from_branches(&[b.clone()]);
+        let item = BranchItem::new(b, layout, DisplayColors::default());
         assert!(item.colors.enabled);
         let line = item.display(DisplayContext::default());
         assert!(!line.spans.is_empty());

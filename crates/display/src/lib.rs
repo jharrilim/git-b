@@ -3,10 +3,74 @@
 use std::collections::HashSet;
 use std::path::PathBuf;
 
+use parse::Branch;
 use ratatui::style::{Color, Style};
 pub use ratatui::text::Line;
 use ratatui::text::Span;
 use serde::Deserialize;
+
+/// Column widths for aligned branch listing in the picker.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct DisplayLayout {
+    pub name_width: usize,
+    pub hash_width: usize,
+}
+
+impl DisplayLayout {
+    /// Compute column widths from the longest name and hash in the list.
+    pub fn from_branches(branches: &[Branch]) -> Self {
+        let name_width = branches
+            .iter()
+            .map(|b| b.name.chars().count())
+            .max()
+            .unwrap_or(0);
+        let hash_width = branches
+            .iter()
+            .map(|b| b.short_hash.chars().count())
+            .max()
+            .unwrap_or(0);
+        Self {
+            name_width,
+            hash_width,
+        }
+    }
+
+    /// Format `name`, `hash`, and `subject` on aligned columns (space-padded).
+    pub fn format_line(&self, branch: &Branch) -> String {
+        format!(
+            "{:<name_w$} {:<hash_w$} {}",
+            branch.name,
+            branch.short_hash,
+            branch.subject,
+            name_w = self.name_width,
+            hash_w = self.hash_width,
+        )
+    }
+
+    /// Char-index boundaries for the three fields in [`Self::format_line`] output.
+    pub fn field_ranges(self) -> FieldRanges {
+        FieldRanges {
+            name_end: self.name_width,
+            hash_end: self.name_width + 1 + self.hash_width,
+        }
+    }
+
+    /// Byte ranges in `display` for skim name vs subject matching.
+    pub fn matching_ranges(self, display: &str) -> [(usize, usize); 2] {
+        let name_end = char_index_to_byte(display, self.name_width);
+        let subject_start =
+            char_index_to_byte(display, self.name_width + 1 + self.hash_width + 1);
+        [(0, name_end), (subject_start, display.len())]
+    }
+}
+
+/// Byte offset at a character index (for skim match ranges).
+pub fn char_index_to_byte(s: &str, char_idx: usize) -> usize {
+    s.char_indices()
+        .nth(char_idx)
+        .map(|(i, _)| i)
+        .unwrap_or(s.len())
+}
 
 /// Colors for the three fields shown in the branch picker.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -235,14 +299,6 @@ pub struct FieldRanges {
     pub hash_end: usize,
 }
 
-pub fn field_ranges(name: &str, hash: &str, _subject: &str) -> FieldRanges {
-    let name_end = name.chars().count();
-    let hash_end = name_end + 1 + hash.chars().count();
-    FieldRanges {
-        name_end,
-        hash_end,
-    }
-}
 
 fn style_at(index: usize, ranges: FieldRanges, colors: DisplayColors) -> Style {
     if index < ranges.name_end {
@@ -332,6 +388,43 @@ subject = "magenta"
     fn parse_config_disabled() {
         let colors = parse_config("[colors]\nenabled = false\n").unwrap();
         assert!(!colors.enabled);
+    }
+
+    #[test]
+    fn aligned_columns_pad_shorter_names() {
+        let branches = [
+            Branch {
+                name: "main".into(),
+                short_hash: "abc1234".into(),
+                subject: "init".into(),
+            },
+            Branch {
+                name: "feature/long-name".into(),
+                short_hash: "abc1234".into(),
+                subject: "wip".into(),
+            },
+        ];
+        let layout = DisplayLayout::from_branches(&branches);
+        assert_eq!(layout.name_width, "feature/long-name".chars().count());
+
+        let short = layout.format_line(&branches[0]);
+        let long = layout.format_line(&branches[1]);
+        let hash_col = layout.name_width + 1;
+        assert_eq!(
+            short.chars().skip(hash_col).take(7).collect::<String>(),
+            "abc1234"
+        );
+        assert_eq!(
+            long.chars().skip(hash_col).take(7).collect::<String>(),
+            "abc1234"
+        );
+
+        let subject_col = layout.name_width + 1 + layout.hash_width + 1;
+        assert_eq!(
+            short.chars().skip(subject_col).collect::<String>(),
+            "init"
+        );
+        assert_eq!(long.chars().skip(subject_col).collect::<String>(), "wip");
     }
 
     #[test]

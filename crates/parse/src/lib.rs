@@ -12,7 +12,7 @@ pub struct Branch {
 }
 
 impl Branch {
-    /// Format like `git branch -v` for display in the picker.
+    /// Format a single branch without cross-row padding (see `display::DisplayLayout`).
     pub fn display_line(&self) -> String {
         format!("{} {} {}", self.name, self.short_hash, self.subject)
     }
@@ -106,9 +106,9 @@ mod tests {
 
     #[test]
     fn parse_subject_with_tabs() {
-        let branch = parse_line("feature/foo\tdeadbeef\tfix\tthing\tnow").unwrap();
+        let branch = parse_line("feature/foo\tabc1234\tfix\tthing\tnow").unwrap();
         assert_eq!(branch.name, "feature/foo");
-        assert_eq!(branch.short_hash, "deadbeef");
+        assert_eq!(branch.short_hash, "abc1234");
         assert_eq!(branch.subject, "fix\tthing\tnow");
     }
 
