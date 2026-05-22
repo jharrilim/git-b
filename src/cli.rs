@@ -6,7 +6,7 @@ use clap::Parser;
 #[command(version = env!("CARGO_PKG_VERSION"))]
 #[command(about = "Fuzzy git branch picker.")]
 pub struct Args {
-    /// An approximate branch name to navigate to.
+    /// Branch name to fuzzy-match and checkout directly (skips the picker).
     #[arg()]
     pub branch: Option<String>,
 }

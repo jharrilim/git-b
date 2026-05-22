@@ -9,41 +9,55 @@ fn main() {
 
     let branches = branch_names();
 
-    let options = match args.branch {
-        Some(branch) => SkimOptionsBuilder::default()
-            .multi(false)
-            .query(branch)
-            .no_sort(true)
-            .build()
-            .unwrap(),
-        None => SkimOptionsBuilder::default()
-            .multi(false)
-            .no_sort(true)
-            .build()
-            .unwrap(),
-    };
+    if let Some(query) = args.branch {
+        match find_first_matching_branch(&branches, &query) {
+            Some(branch) => git_checkout(branch),
+            None => {
+                eprintln!("no branch matching '{query}'");
+                std::process::exit(1);
+            }
+        }
+        return;
+    }
+
+    let options = SkimOptionsBuilder::default()
+        .multi(false)
+        .no_sort(true)
+        .build()
+        .unwrap();
 
     match Skim::run_items(options, branches) {
         Ok(output) => {
             if output.is_abort {
                 return;
             }
-            // This indexer should be safe, as they should have always had picked
-            // one option at this point.
             let selected_item = &output.selected_items[0];
             let line = selected_item.output();
-            let branch = line.split_whitespace().next();
-            match branch {
-                Some(branch) => {
-                    git_checkout(branch.to_string());
-                }
+            match branch_name_from_line(&line) {
+                Some(branch) => git_checkout(branch),
                 None => {
-                    println!("Branch name invalid, somehow. Report this:\n'{}'", line);
+                    println!("Branch name invalid, somehow. Report this:\n'{line}'");
                 }
             }
         }
         Err(e) => eprintln!("skim error: {e}"),
     }
+}
+
+fn find_first_matching_branch(branches: &[String], query: &str) -> Option<String> {
+    let factory = ExactOrFuzzyEngineFactory::builder().build();
+    let engine = factory.create_engine(query);
+
+    for line in branches {
+        if engine.match_item(line).is_some() {
+            return branch_name_from_line(line);
+        }
+    }
+    None
+}
+
+fn branch_name_from_line(line: &str) -> Option<String> {
+    line.split_whitespace().next().map(str::to_string)
 }
 
 fn git_checkout(branch: String) {
