@@ -1,10 +1,15 @@
-use clap::Parser;
+pub use clap::Parser;
 
 #[derive(Parser, Debug)]
 #[command(name = "git-b")]
 #[command(author = "Joseph Harrison-Lim <josephharrisonlim@gmail.com>")]
 #[command(version = env!("CARGO_PKG_VERSION"))]
-#[command(about = "Fuzzy git branch picker.")]
+#[command(
+    about = "Fuzzy git branch picker.",
+    long_about = "Interactive fuzzy finder for git branches, sorted by recent commit date.\n\n\
+                  Without arguments, opens a picker to choose a branch. With a branch name, \
+                  checks out the first fuzzy match. Use -b to create and checkout a new branch."
+)]
 pub struct Args {
     /// Create and checkout a new branch (`git checkout -b`).
     #[arg(short = 'b')]

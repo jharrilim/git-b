@@ -16,7 +16,7 @@ brew install git-b
 ### Install on Linux
 
 - Download a linux release from the releases page (it'll have an `unknown-linux-gnu.tar.gz` suffix)
-- Unpack it with `tar xf git-b-v1.0.0-x86_64-unknown-linux-gnu.tar.gz`
+- Unpack with `tar xf git-b-v1.0.0-x86_64-unknown-linux-gnu.tar.gz` (includes `git-b` and `share/man/man1/git-b.1`)
 
 ### Install from source
 
@@ -32,6 +32,23 @@ cargo install --path .
 
 Anywhere within a project under git source control, you may run `git-b`.
 You may also configure a git alias for it, such as `git b`.
+
+```sh
+git-b              # open the fuzzy branch picker
+git-b feature      # checkout the first branch matching "feature"
+git-b -b new-name  # git checkout -b new-name
+man git-b          # after installing the man page (see below)
+```
+
+### Man page
+
+Building from source generates `man/git-b.1` via [clap_mangen](https://crates.io/crates/clap_mangen). Install it with:
+
+```sh
+cargo build --release
+sudo mkdir -p /usr/local/share/man/man1
+sudo cp man/git-b.1 /usr/local/share/man/man1/
+```
 
 ## Configure git
 

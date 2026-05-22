@@ -870,7 +870,16 @@ name = "git-b"
 version = "1.3.0"
 dependencies = [
  "clap",
+ "clap_mangen",
+ "git-b-cli",
  "skim",
+]
+
+[[package]]
+name = "git-b-cli"
+version = "1.3.0"
+dependencies = [
+ "clap",
 ]
 
 [[package]]

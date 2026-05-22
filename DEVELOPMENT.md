@@ -1,5 +1,17 @@
 # Development
 
+## Man page
+
+The man page is generated at build time with [clap_mangen](https://crates.io/crates/clap_mangen) and written to `man/git-b.1`.
+
+CLI flags and help live in `cli/src/lib.rs` (`git-b-cli` crate). Both the binary and `build.rs` use `git_b_cli::Args::command()` so the man page stays in sync. Bump `version` in the root `[workspace.package]` section of `Cargo.toml` when releasing.
+
+Regenerate after CLI changes:
+
+```sh
+cargo build
+```
+
 ## Releasing a new version
 
 Use these steps when cutting a release for GitHub and Homebrew.
@@ -26,11 +38,13 @@ unset CARGO_TARGET_DIR   # if set (e.g. by Cursor), so artifacts land in ./targe
 This script:
 
 - Cross-compiles release binaries for macOS (Intel and Apple Silicon) and Linux (x86_64)
-- Creates tarballs in the repo root:
+- Creates tarballs in the repo root (each contains `git-b` and `share/man/man1/git-b.1`):
   - `git-b-v<version>-x86_64-apple-darwin.tar.gz`
   - `git-b-v<version>-aarch64-apple-darwin.tar.gz`
   - `git-b-v<version>-x86_64-unknown-linux-gnu.tar.gz`
 - Updates `Formula/git-b.rb` with the new `VERSION` and macOS `sha256` checksums
+
+Release archives use this layout so Homebrew can run `man1.install "share/man/man1/git-b.1"`.
 
 **Prerequisites**
 

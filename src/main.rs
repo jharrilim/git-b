@@ -1,11 +1,9 @@
-use clap::Parser;
+use git_b_cli::{Args, Parser};
 use skim::prelude::*;
 use std::process::Command;
 
-mod cli;
-
 fn main() {
-    let args = cli::Args::parse();
+    let args = Args::parse();
 
     if let Some(name) = args.new_branch {
         git_checkout_new(name);

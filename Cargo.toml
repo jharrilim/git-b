@@ -1,13 +1,27 @@
-[package]
-name = "git-b"
+[workspace]
+members = [".", "cli"]
+resolver = "2"
+
+[workspace.package]
 version = "1.3.0"
 edition = "2021"
+
+[package]
+name = "git-b"
+version.workspace = true
+edition.workspace = true
+build = "build.rs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-clap = { version = "4.6.1", features = ["derive"] }
+git-b-cli = { path = "cli" }
 skim = "4.6.3"
+
+[build-dependencies]
+git-b-cli = { path = "cli" }
+clap = { version = "4.6.1" }
+clap_mangen = "0.3.0"
 
 [profile.release]
 lto = true
