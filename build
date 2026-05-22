@@ -3,7 +3,49 @@
 set -e
 
 name="git-b"
-version="$1"
+version=""
+skip_linux=false
+
+usage() {
+  cat <<EOF
+Usage: $0 <version> [--skip-linux]
+
+  Build release binaries and tarballs for GitHub / Homebrew.
+
+  Options:
+    --skip-linux   Skip the x86_64-unknown-linux-gnu build (no cross-linker required)
+EOF
+  exit "${1:-0}"
+}
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --skip-linux)
+      skip_linux=true
+      shift
+      ;;
+    -h | --help)
+      usage 0
+      ;;
+    -*)
+      echo "error: unknown option: $1" >&2
+      usage 1
+      ;;
+    *)
+      if [[ -n "$version" ]]; then
+        echo "error: unexpected argument: $1" >&2
+        usage 1
+      fi
+      version="$1"
+      shift
+      ;;
+  esac
+done
+
+if [[ -z "$version" ]]; then
+  echo "error: version required" >&2
+  usage 1
+fi
 
 mac_intel="x86_64-apple-darwin"
 mac_silicon="aarch64-apple-darwin"
@@ -30,8 +72,11 @@ package_tarball() {
 # Release build runs build.rs, which writes man/git-b.1
 cargo build --target=$mac_intel --release
 cargo build --target=$mac_silicon --release
-CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER=x86_64-unknown-linux-gnu-gcc \
-  cargo build --target=$linux_intel --release
+
+if [[ "$skip_linux" == false ]]; then
+  CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER=x86_64-unknown-linux-gnu-gcc \
+    cargo build --target=$linux_intel --release
+fi
 
 if [[ ! -f man/git-b.1 ]]; then
   echo "error: man/git-b.1 not found (expected from build.rs)" >&2
@@ -44,8 +89,10 @@ silicon_sha=$(shasum -a 256 "$mac_silicon_tar" | cut -d ' ' -f 1)
 package_tarball "$mac_intel" "$mac_intel_tar"
 intel_sha=$(shasum -a 256 "$mac_intel_tar" | cut -d ' ' -f 1)
 
-package_tarball "$linux_intel" "$linux_intel_tar"
+if [[ "$skip_linux" == false ]]; then
+  package_tarball "$linux_intel" "$linux_intel_tar"
+fi
 
-sed -i '' -e "s|X86_64_SHA\ \=.*|X86_64_SHA = '$intel_sha'|" Formula/git-b.rb
-sed -i '' -e "s|AARCH64_SHA\ \=.*|AARCH64_SHA = '$silicon_sha'|" Formula/git-b.rb
-sed -i '' -e "s|VERSION\ \=.*|VERSION = '$version'|" Formula/git-b.rb
+sed -i '' -e "s|X86_64_SHA =.*|X86_64_SHA = '$intel_sha'|" Formula/git-b.rb
+sed -i '' -e "s|AARCH64_SHA =.*|AARCH64_SHA = '$silicon_sha'|" Formula/git-b.rb
+sed -i '' -e "s|VERSION =.*|VERSION = '$version'|" Formula/git-b.rb

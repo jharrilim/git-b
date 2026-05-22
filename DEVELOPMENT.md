@@ -35,6 +35,12 @@ unset CARGO_TARGET_DIR   # if set (e.g. by Cursor), so artifacts land in ./targe
 ./build 1.3.0
 ```
 
+On macOS without the Linux cross-linker installed, build macOS tarballs only:
+
+```sh
+./build 1.3.0 --skip-linux
+```
+
 This script:
 
 - Cross-compiles release binaries for macOS (Intel and Apple Silicon) and Linux (x86_64)
@@ -62,7 +68,7 @@ Release archives use this layout so Homebrew can run `man1.install "share/man/ma
   brew install x86_64-unknown-linux-gnu
   ```
 
-If the Linux build fails with `x86_64-linux-gnu-gcc` not found, install the cross toolchain from [README.md](README.md#compiling-from-mac-to-linux) and re-run `./build`, or build the Linux tarball on a Linux machine / in CI.
+If the Linux build fails with `x86_64-linux-gnu-gcc` not found, use `./build <version> --skip-linux`, install the cross toolchain from [README.md](README.md#compiling-from-mac-to-linux) and re-run without the flag, or build the Linux tarball on a Linux machine / in CI.
 
 If you only need macOS artifacts locally, you can build individual targets:
 
