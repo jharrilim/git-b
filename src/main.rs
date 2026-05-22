@@ -7,6 +7,11 @@ mod cli;
 fn main() {
     let args = cli::Args::parse();
 
+    if let Some(name) = args.new_branch {
+        git_checkout_new(name);
+        return;
+    }
+
     let branches = branch_names();
 
     if let Some(query) = args.branch {
@@ -63,9 +68,23 @@ fn branch_name_from_line(line: &str) -> Option<String> {
 fn git_checkout(branch: String) {
     let output = Command::new("git")
         .arg("checkout")
-        .arg(branch)
+        .arg(&branch)
         .output()
         .expect("failed to execute process");
+    print_git_output(&output);
+}
+
+fn git_checkout_new(branch: String) {
+    let output = Command::new("git")
+        .arg("checkout")
+        .arg("-b")
+        .arg(&branch)
+        .output()
+        .expect("failed to execute process");
+    print_git_output(&output);
+}
+
+fn print_git_output(output: &std::process::Output) {
     println!("{}", String::from_utf8_lossy(&output.stdout));
     println!("{}", String::from_utf8_lossy(&output.stderr));
 }
