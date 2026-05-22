@@ -1,9 +1,9 @@
 [workspace]
-members = [".", "crates/cli", "crates/parse", "crates/algo"]
+members = [".", "crates/cli", "crates/parse", "crates/algo", "crates/display"]
 resolver = "2"
 
 [workspace.package]
-version = "1.4.0"
+version = "1.5.0"
 edition = "2021"
 
 [package]
@@ -17,6 +17,7 @@ build = "build.rs"
 [dependencies]
 algo = { path = "crates/algo" }
 cli = { path = "crates/cli" }
+display = { path = "crates/display" }
 parse = { path = "crates/parse" }
 skim = "4.6.3"
 

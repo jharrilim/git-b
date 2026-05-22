@@ -1,0 +1,11 @@
+[package]
+name = "display"
+version.workspace = true
+edition.workspace = true
+description = "Display colors for git-b branch picker"
+publish = false
+
+[dependencies]
+ratatui = "0.30"
+serde = { version = "1.0", features = ["derive"] }
+toml = "0.8"

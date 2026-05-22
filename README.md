@@ -38,7 +38,26 @@ git-b              # open the fuzzy branch picker
 git-b feature      # checkout the first branch matching "feature"
 git-b -b new-name  # git checkout -b new-name
 man git-b          # after installing the man page (see below)
+git-b --no-color   # disable picker colors for this run
 ```
+
+### Colors
+
+Picker lines show the branch name, short hash, and commit subject in separate colors. Defaults are cyan, yellow, and white.
+
+Create `~/.git-b/config.toml`:
+
+```toml
+[colors]
+enabled = true
+name = "cyan"
+hash = "yellow"
+subject = "white"
+```
+
+Set `enabled = false` to turn colors off globally. Supported color names include `red`, `green`, `blue`, `magenta`, `cyan`, `gray`, and `bright-*` variants (for example `bright-green`). Use `default` or `none` to leave a field unstyled.
+
+CLI flags override the config file for a single run: `--no-color`, or `--color NAME:HASH:SUBJECT` (for example `cyan:yellow:white`).
 
 ### Man page
 

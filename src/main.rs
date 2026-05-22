@@ -1,10 +1,17 @@
 use algo::BranchItem;
 use cli::{Args, Parser};
+use display::{load, ColorOverrides};
 use skim::prelude::*;
 use std::process::Command;
 
 fn main() {
     let args = Args::parse();
+
+    let colors = load(&ColorOverrides {
+        disabled: args.no_color.then_some(true),
+        triple: args.color.clone(),
+        ..Default::default()
+    });
 
     if let Some(name) = args.new_branch {
         git_checkout_new(name);
@@ -30,7 +37,10 @@ fn main() {
         return;
     }
 
-    let items: Vec<BranchItem> = branches.into_iter().map(BranchItem::from).collect();
+    let items: Vec<BranchItem> = branches
+        .into_iter()
+        .map(|b| BranchItem::new(b, colors))
+        .collect();
 
     let options = SkimOptionsBuilder::default()
         .multi(false)

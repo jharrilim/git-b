@@ -18,4 +18,12 @@ pub struct Args {
     /// Branch name to fuzzy-match and checkout directly (skips the picker).
     #[arg()]
     pub branch: Option<String>,
+
+    /// Disable colored branch listing in the picker.
+    #[arg(long = "no-color")]
+    pub no_color: bool,
+
+    /// Set field colors as NAME:HASH:SUBJECT (e.g. cyan:yellow:white).
+    #[arg(long = "color", value_name = "NAME:HASH:SUBJECT")]
+    pub color: Option<String>,
 }

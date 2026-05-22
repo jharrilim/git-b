@@ -1,10 +1,12 @@
 //! Weighted fuzzy matching for branches (name preferred over commit subject).
 
 use std::borrow::Cow;
+use std::collections::HashSet;
 
+use display::{colored_line, field_ranges, DisplayColors, FieldRanges, Line};
 use parse::Branch;
 use skim::prelude::*;
-use skim::{MatchEngine, MatchEngineFactory, SkimItem};
+use skim::{DisplayContext, MatchEngine, MatchEngineFactory, Matches, SkimItem};
 
 /// Multiply name-field fuzzy scores so name matches outrank subject-only matches.
 pub const NAME_WEIGHT: i32 = 1_000;
@@ -21,18 +23,23 @@ pub struct BranchItem {
     branch: Branch,
     display: String,
     matching_ranges: [(usize, usize); 2],
+    field_ranges: FieldRanges,
+    colors: DisplayColors,
 }
 
 impl BranchItem {
-    pub fn new(branch: Branch) -> Self {
+    pub fn new(branch: Branch, colors: DisplayColors) -> Self {
         let display = branch.display_line();
         let name_end = branch.name.len();
         let subject_start = name_end + 1 + branch.short_hash.len() + 1;
         let subject_end = display.len();
+        let field = field_ranges(&branch.name, &branch.short_hash, &branch.subject);
         Self {
             branch,
             display,
-            matching_ranges: [(0, name_end), (subject_start, subject_end)],
+            matching_ranges: [(0, name_end), (subject_start, subject_end)], // byte ranges for skim
+            field_ranges: field, // char ranges for display colors
+            colors,
         }
     }
 
@@ -43,7 +50,26 @@ impl BranchItem {
 
 impl From<Branch> for BranchItem {
     fn from(branch: Branch) -> Self {
-        Self::new(branch)
+        Self::new(branch, DisplayColors::default())
+    }
+}
+
+fn highlight_chars(text: &str, matches: &Matches) -> HashSet<usize> {
+    match matches {
+        Matches::None => HashSet::new(),
+        Matches::CharIndices(indices) => indices.iter().copied().collect(),
+        Matches::CharRange(start, end) => (*start..*end).collect(),
+        Matches::ByteRange(start, end) => {
+            let mut set = HashSet::new();
+            let mut ci = 0;
+            for (bi, _) in text.char_indices() {
+                if bi >= *start && bi < *end {
+                    set.insert(ci);
+                }
+                ci += 1;
+            }
+            set
+        }
     }
 }
 
@@ -58,6 +84,21 @@ impl SkimItem for BranchItem {
 
     fn get_matching_ranges(&self) -> Option<&[(usize, usize)]> {
         Some(&self.matching_ranges)
+    }
+
+    fn display(&self, context: DisplayContext) -> Line<'_> {
+        if !self.colors.enabled {
+            return context.to_line(Cow::Borrowed(&self.display));
+        }
+        let highlight = highlight_chars(&self.display, &context.matches);
+        colored_line(
+            &self.display,
+            self.field_ranges,
+            self.colors,
+            context.base_style,
+            context.matched_style,
+            &highlight,
+        )
     }
 }
 
@@ -132,6 +173,7 @@ pub fn find_first_matching<'a>(query: &str, branches: &'a [Branch]) -> Option<&'
 #[cfg(test)]
 mod tests {
     use super::*;
+    use display::DisplayColors;
     use parse::Branch;
 
     fn branch(name: &str, subject: &str) -> Branch {
@@ -164,16 +206,24 @@ mod tests {
 
     #[test]
     fn branch_item_output_is_checkout_name() {
-        let item = BranchItem::new(branch("foo/bar", "subject"));
+        let item = BranchItem::new(branch("foo/bar", "subject"), DisplayColors::disabled());
         assert_eq!(item.output(), "foo/bar");
         assert_eq!(item.text(), "foo/bar abc1234 subject");
     }
 
     #[test]
     fn branch_item_matching_ranges_name_before_subject() {
-        let item = BranchItem::new(branch("my-branch", "my subject"));
+        let item = BranchItem::new(branch("my-branch", "my subject"), DisplayColors::disabled());
         let ranges = item.get_matching_ranges().unwrap();
         assert_eq!(ranges[0], (0, "my-branch".len()));
         assert!(ranges[1].0 > ranges[0].1);
+    }
+
+    #[test]
+    fn colored_display_when_enabled() {
+        let item = BranchItem::new(branch("main", "init"), DisplayColors::default());
+        assert!(item.colors.enabled);
+        let line = item.display(DisplayContext::default());
+        assert!(!line.spans.is_empty());
     }
 }

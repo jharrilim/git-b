@@ -4,7 +4,7 @@
 .SH NAME
 git\-b \- Fuzzy git branch picker.
 .SH SYNOPSIS
-\fBgit\-b\fR [\fB\-b \fR] [\fB\-h\fR|\fB\-\-help\fR] [\fB\-V\fR|\fB\-\-version\fR] [\fIBRANCH\fR] 
+\fBgit\-b\fR [\fB\-b \fR] [\fB\-\-no\-color\fR] [\fB\-\-color\fR] [\fB\-h\fR|\fB\-\-help\fR] [\fB\-V\fR|\fB\-\-version\fR] [\fIBRANCH\fR] 
 .SH DESCRIPTION
 Interactive fuzzy finder for git branches, sorted by recent commit date.
 .PP
@@ -13,6 +13,12 @@ Without arguments, opens a picker to choose a branch. With a branch name, checks
 .TP
 \fB\-b\fR \fI<NEW_BRANCH>\fR
 Create and checkout a new branch (git checkout \-b)
+.TP
+\fB\-\-no\-color\fR
+Disable colored branch listing in the picker
+.TP
+\fB\-\-color\fR \fI<NAME:HASH:SUBJECT>\fR
+Set field colors as NAME:HASH:SUBJECT (e.g. cyan:yellow:white)
 .TP
 \fB\-h\fR, \fB\-\-help\fR
 Print help (see a summary with \*(Aq\-h\*(Aq)

@@ -7,8 +7,11 @@
 | `cli` | [`crates/cli`](crates/cli) | Clap CLI definition |
 | `parse` | [`crates/parse`](crates/parse) | Load branches via `git for-each-ref` (name, hash, subject) |
 | `algo` | [`crates/algo`](crates/algo) | Weighted fuzzy match (name preferred over commit subject); `BranchItem` for Skim |
+| `display` | [`crates/display`](crates/display) | Picker colors from `~/.git-b/config.toml`; CLI `--no-color` / `--color` overrides |
 
 Tune name vs subject ranking in [`crates/algo/src/lib.rs`](crates/algo/src/lib.rs): `NAME_WEIGHT`, `EXACT_NAME_BONUS`, `PREFIX_NAME_BONUS`.
+
+User-facing color config lives in `~/.git-b/config.toml` under `[colors]` (see README). Precedence: defaults → config file → CLI flags.
 
 ## Man page
 

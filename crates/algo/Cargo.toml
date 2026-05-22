@@ -6,5 +6,6 @@ description = "Weighted branch matching for git-b"
 publish = false
 
 [dependencies]
+display = { path = "../display" }
 parse = { path = "../parse" }
 skim = "4.6.3"
