@@ -1,4 +1,4 @@
-use git_b_cli::{Args, Parser};
+use cli::{Args, Parser};
 use skim::prelude::*;
 use std::process::Command;
 

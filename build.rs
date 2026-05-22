@@ -5,7 +5,7 @@ use std::path::PathBuf;
 
 use clap::CommandFactory;
 use clap_mangen::Man;
-use git_b_cli::Args;
+use cli::Args;
 
 fn main() -> io::Result<()> {
     let manifest_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").map_err(io::Error::other)?);
@@ -19,7 +19,7 @@ fn main() -> io::Result<()> {
     man.render(&mut buffer)?;
     fs::write(&man_path, buffer)?;
 
-    println!("cargo:rerun-if-changed=cli/src/lib.rs");
+    println!("cargo:rerun-if-changed=crates/cli/src/lib.rs");
     println!("cargo:rerun-if-changed=build.rs");
 
     Ok(())

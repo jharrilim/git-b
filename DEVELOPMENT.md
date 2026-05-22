@@ -4,7 +4,7 @@
 
 The man page is generated at build time with [clap_mangen](https://crates.io/crates/clap_mangen) and written to `man/git-b.1`.
 
-CLI flags and help live in `cli/src/lib.rs` (`git-b-cli` crate). Both the binary and `build.rs` use `git_b_cli::Args::command()` so the man page stays in sync. Bump `version` in the root `[workspace.package]` section of `Cargo.toml` when releasing.
+CLI flags and help live in `crates/cli/src/lib.rs` (`cli` crate). Both the binary and `build.rs` use `cli::Args::command()` so the man page stays in sync. Bump `version` in the root `[workspace.package]` section of `Cargo.toml` when releasing.
 
 Regenerate after CLI changes:
 
