@@ -64,15 +64,15 @@ Then create tarballs manually from `target/<triple>/release/git-b`.
 After the version bump is committed:
 
 ```sh
-git tag v1.3.0
-git push origin v1.3.0
+git tag 1.3.0
+git push origin 1.3.0
 ```
 
-Tag names must match the `Cargo.toml` version with a `v` prefix.
+Tag names must match the `Cargo.toml` version exactly (no `v` prefix). This matches existing tags (`1.0.0`, `1.1.0`, `1.2.0`) and the Homebrew formula download URLs (`releases/download/<version>/...`).
 
 ### 4. Publish GitHub release
 
-1. Open [GitHub Releases](https://github.com/jharrilim/git-b/releases) and create a release for tag `v1.3.0`.
+1. Open [GitHub Releases](https://github.com/jharrilim/git-b/releases) and create a release for tag `1.3.0`.
 2. Upload the three tarballs produced by `./build`.
 3. Optionally attach release notes (dependency upgrades, `-b` flag, direct checkout, etc.).
 
@@ -100,6 +100,6 @@ brew upgrade git-b
 - [ ] `./build <version>` succeeded; tarballs in repo root
 - [ ] `Formula/git-b.rb` version and SHA256 values updated
 - [ ] Changes committed on `main`
-- [ ] Git tag `v<version>` created and pushed
+- [ ] Git tag `<version>` created and pushed (no `v` prefix)
 - [ ] GitHub release created with tarball assets
 - [ ] `homebrew-git-b` tap updated and pushed
