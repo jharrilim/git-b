@@ -1,38 +1,30 @@
 use clap::Parser;
 use skim::prelude::*;
-use std::{io::BufReader, process::Command};
+use std::process::Command;
 
 mod cli;
 
 fn main() {
     let args = cli::Args::parse();
 
-    let branches = branch_names().join("\n");
-
-    // SkimItemReader#of_bufread requires a 'static lifetime on this.
-    // Leaking it prevents it from being destroyed and thus makes it 'static.
-    let b = Box::leak(branches.into_boxed_str());
-    let reader = BufReader::new(b.as_bytes());
+    let branches = branch_names();
 
     let options = match args.branch {
-        Some(branch) => {
-            let branch = Box::leak(branch.into_boxed_str());
-
-            SkimOptionsBuilder::default()
-                .multi(false)
-                .query(Some(branch))
-                .nosort(true)
-                .build()
-                .unwrap()
-        }
-        None => SkimOptionsBuilder::default().multi(false).nosort(true).build().unwrap(),
+        Some(branch) => SkimOptionsBuilder::default()
+            .multi(false)
+            .query(branch)
+            .no_sort(true)
+            .build()
+            .unwrap(),
+        None => SkimOptionsBuilder::default()
+            .multi(false)
+            .no_sort(true)
+            .build()
+            .unwrap(),
     };
 
-    let item_reader = SkimItemReader::default();
-    let items = item_reader.of_bufread(reader);
-
-    match Skim::run_with(&options, Some(items)) {
-        Some(output) => {
+    match Skim::run_items(options, branches) {
+        Ok(output) => {
             if output.is_abort {
                 return;
             }
@@ -50,7 +42,7 @@ fn main() {
                 }
             }
         }
-        None => {}
+        Err(e) => eprintln!("skim error: {e}"),
     }
 }
 
