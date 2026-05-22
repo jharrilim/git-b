@@ -1,5 +1,5 @@
 [workspace]
-members = [".", "crates/cli"]
+members = [".", "crates/cli", "crates/parse", "crates/algo"]
 resolver = "2"
 
 [workspace.package]
@@ -15,7 +15,9 @@ build = "build.rs"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+algo = { path = "crates/algo" }
 cli = { path = "crates/cli" }
+parse = { path = "crates/parse" }
 skim = "4.6.3"
 
 [build-dependencies]

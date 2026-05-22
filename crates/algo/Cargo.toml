@@ -1,0 +1,10 @@
+[package]
+name = "algo"
+version.workspace = true
+edition.workspace = true
+description = "Weighted branch matching for git-b"
+publish = false
+
+[dependencies]
+parse = { path = "../parse" }
+skim = "4.6.3"

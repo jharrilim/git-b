@@ -1,5 +1,15 @@
 # Development
 
+## Crates
+
+| Crate | Path | Role |
+|-------|------|------|
+| `cli` | [`crates/cli`](crates/cli) | Clap CLI definition |
+| `parse` | [`crates/parse`](crates/parse) | Load branches via `git for-each-ref` (name, hash, subject) |
+| `algo` | [`crates/algo`](crates/algo) | Weighted fuzzy match (name preferred over commit subject); `BranchItem` for Skim |
+
+Tune name vs subject ranking in [`crates/algo/src/lib.rs`](crates/algo/src/lib.rs): `NAME_WEIGHT`, `EXACT_NAME_BONUS`, `PREFIX_NAME_BONUS`.
+
 ## Man page
 
 The man page is generated at build time with [clap_mangen](https://crates.io/crates/clap_mangen) and written to `man/git-b.1`.

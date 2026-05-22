@@ -1,0 +1,8 @@
+[package]
+name = "parse"
+version.workspace = true
+edition.workspace = true
+description = "Parse git branch metadata for git-b"
+publish = false
+
+[dependencies]
