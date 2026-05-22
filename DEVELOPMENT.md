@@ -105,9 +105,42 @@ Tag names must match the `Cargo.toml` version exactly (no `v` prefix). This matc
 
 ### 4. Publish GitHub release
 
-1. Open [GitHub Releases](https://github.com/jharrilim/git-b/releases) and create a release for tag `1.3.0`.
-2. Upload the three tarballs produced by `./build`.
-3. Optionally attach release notes (dependency upgrades, `-b` flag, direct checkout, etc.).
+Create the release from the CLI with [GitHub CLI](https://cli.github.com/) (`gh`). The tag must already exist on the remote (step 3).
+
+Attach every tarball you built. If you used `--skip-linux`, pass only the two macOS archives:
+
+```sh
+gh release create 1.5.0 \
+  --title "1.5.0" \
+  --notes "$(cat <<'EOF'
+## What's new
+
+- Short summary of changes for this version
+
+## Install
+
+    brew update && brew upgrade git-b
+EOF
+)" \
+  git-b-v1.5.0-x86_64-apple-darwin.tar.gz \
+  git-b-v1.5.0-aarch64-apple-darwin.tar.gz
+```
+
+When the Linux build succeeded, add the third asset:
+
+```sh
+  git-b-v1.5.0-x86_64-unknown-linux-gnu.tar.gz
+```
+
+`gh release create` uploads the listed files as release assets and publishes the release in one step. Replace `1.5.0` and the tarball filenames with your version.
+
+To publish an existing tag without uploading assets yet:
+
+```sh
+gh release create 1.5.0 --title "1.5.0" --notes "Release notes here."
+```
+
+You can also open [GitHub Releases](https://github.com/jharrilim/git-b/releases) in the browser and upload tarballs manually if you prefer.
 
 ### 5. Update Homebrew
 
@@ -134,5 +167,5 @@ brew upgrade git-b
 - [ ] `Formula/git-b.rb` version and SHA256 values updated
 - [ ] Changes committed on `main`
 - [ ] Git tag `<version>` created and pushed (no `v` prefix)
-- [ ] GitHub release created with tarball assets
+- [ ] GitHub release created (`gh release create` or web UI) with tarball assets
 - [ ] `homebrew-git-b` tap updated and pushed
