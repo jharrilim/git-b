@@ -18,9 +18,15 @@ fn main() {
         return;
     }
 
-    if args.branch.as_deref() == Some("-") {
-        git_checkout_previous();
-        return;
+    if let Some(branch) = args.branch.as_deref() {
+        if branch == "-" {
+            git_checkout_ago(1);
+            return;
+        }
+        if let Some(n) = parse_checkout_ago(branch) {
+            git_checkout_ago(n);
+            return;
+        }
     }
 
     let branches = match parse::list_branches() {
@@ -85,16 +91,47 @@ fn git_checkout_new(branch: String) {
     print_git_output(&output);
 }
 
-fn git_checkout_previous() {
+/// Parse `~N` (e.g. `~1`, `~2`) as the Nth previously checked-out branch.
+fn parse_checkout_ago(s: &str) -> Option<u32> {
+    let n: u32 = s.strip_prefix('~')?.parse().ok()?;
+    (n >= 1).then_some(n)
+}
+
+fn git_checkout_ago(n: u32) {
+    let spec = format!("@{{-{n}}}");
     let output = Command::new("git")
         .arg("checkout")
-        .arg("-")
+        .arg(&spec)
         .output()
         .expect("failed to execute process");
     print_git_output(&output);
+    if !output.status.success() {
+        std::process::exit(output.status.code().unwrap_or(1));
+    }
 }
 
 fn print_git_output(output: &std::process::Output) {
     println!("{}", String::from_utf8_lossy(&output.stdout));
     println!("{}", String::from_utf8_lossy(&output.stderr));
+}
+
+#[cfg(test)]
+mod tests {
+    use super::parse_checkout_ago;
+
+    #[test]
+    fn parse_checkout_ago_valid() {
+        assert_eq!(parse_checkout_ago("~1"), Some(1));
+        assert_eq!(parse_checkout_ago("~2"), Some(2));
+        assert_eq!(parse_checkout_ago("~10"), Some(10));
+    }
+
+    #[test]
+    fn parse_checkout_ago_invalid() {
+        assert_eq!(parse_checkout_ago("~0"), None);
+        assert_eq!(parse_checkout_ago("~"), None);
+        assert_eq!(parse_checkout_ago("~x"), None);
+        assert_eq!(parse_checkout_ago("feature"), None);
+        assert_eq!(parse_checkout_ago("-"), None);
+    }
 }

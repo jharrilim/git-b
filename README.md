@@ -45,7 +45,8 @@ You may also configure a git alias for it, such as `git b`.
 ```sh
 git-b              # open the fuzzy branch picker
 git-b feature      # checkout the first branch matching "feature"
-git-b -            # git checkout - (previous branch)
+git-b -            # checkout the last checked-out branch
+git-b ~2           # checkout the 2nd-to-last checked-out branch
 git-b -b new-name  # git checkout -b new-name
 man git-b          # after installing the man page (see below)
 git-b --no-color   # disable picker colors for this run

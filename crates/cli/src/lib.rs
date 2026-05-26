@@ -8,8 +8,9 @@ pub use clap::Parser;
     about = "Fuzzy git branch picker.",
     long_about = "Interactive fuzzy finder for git branches, sorted by recent commit date.\n\n\
                   Without arguments, opens a picker to choose a branch. With a branch name, \
-                  checks out the first fuzzy match. Use - to switch to the previous branch \
-                  (git checkout -). Use -b to create and checkout a new branch."
+                  checks out the first fuzzy match. Use - or ~N to switch to a previously \
+                  checked-out branch (~1 is the last, ~2 the second-to-last, etc.). \
+                  Use -b to create and checkout a new branch."
 )]
 pub struct Args {
     /// Create and checkout a new branch (`git checkout -b`).
@@ -17,7 +18,7 @@ pub struct Args {
     pub new_branch: Option<String>,
 
     /// Branch name to fuzzy-match and checkout directly (skips the picker).
-    /// Pass `-` to switch to the previous branch (`git checkout -`).
+    /// Pass `-` or `~1` for the last checked-out branch; `~2` for the second-to-last, etc.
     #[arg()]
     pub branch: Option<String>,
 
