@@ -28,6 +28,15 @@ cd git-b
 cargo install --path .
 ```
 
+### Configure git
+
+To configure a `git b` alias, run:
+
+```sh
+git config --global alias.b '!git-b'
+```
+
+
 ## Usage
 
 Anywhere within a project under git source control, you may run `git-b`.
@@ -36,6 +45,7 @@ You may also configure a git alias for it, such as `git b`.
 ```sh
 git-b              # open the fuzzy branch picker
 git-b feature      # checkout the first branch matching "feature"
+git-b -            # git checkout - (previous branch)
 git-b -b new-name  # git checkout -b new-name
 man git-b          # after installing the man page (see below)
 git-b --no-color   # disable picker colors for this run
@@ -67,14 +77,6 @@ Building from source generates `man/git-b.1` via [clap_mangen](https://crates.io
 cargo build --release
 sudo mkdir -p /usr/local/share/man/man1
 sudo cp man/git-b.1 /usr/local/share/man/man1/
-```
-
-## Configure git
-
-To configure a `git b` alias, run:
-
-```sh
-git config --global alias.b '!git-b'
 ```
 
 ---

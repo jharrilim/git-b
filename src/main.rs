@@ -18,6 +18,11 @@ fn main() {
         return;
     }
 
+    if args.branch.as_deref() == Some("-") {
+        git_checkout_previous();
+        return;
+    }
+
     let branches = match parse::list_branches() {
         Ok(branches) => branches,
         Err(e) => {
@@ -75,6 +80,15 @@ fn git_checkout_new(branch: String) {
         .arg("checkout")
         .arg("-b")
         .arg(&branch)
+        .output()
+        .expect("failed to execute process");
+    print_git_output(&output);
+}
+
+fn git_checkout_previous() {
+    let output = Command::new("git")
+        .arg("checkout")
+        .arg("-")
         .output()
         .expect("failed to execute process");
     print_git_output(&output);

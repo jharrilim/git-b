@@ -58,8 +58,7 @@ impl DisplayLayout {
     /// Byte ranges in `display` for skim name vs subject matching.
     pub fn matching_ranges(self, display: &str) -> [(usize, usize); 2] {
         let name_end = char_index_to_byte(display, self.name_width);
-        let subject_start =
-            char_index_to_byte(display, self.name_width + 1 + self.hash_width + 1);
+        let subject_start = char_index_to_byte(display, self.name_width + 1 + self.hash_width + 1);
         [(0, name_end), (subject_start, display.len())]
     }
 }
@@ -264,11 +263,7 @@ pub fn parse_color(s: &str) -> Result<Color, String> {
         _ => return Err(format!("unknown color: {s}")),
     };
 
-    Ok(if bright {
-        brighten(base)
-    } else {
-        base
-    })
+    Ok(if bright { brighten(base) } else { base })
 }
 
 fn brighten(color: Color) -> Color {
@@ -298,7 +293,6 @@ pub struct FieldRanges {
     pub name_end: usize,
     pub hash_end: usize,
 }
-
 
 fn style_at(index: usize, ranges: FieldRanges, colors: DisplayColors) -> Style {
     if index < ranges.name_end {
@@ -420,10 +414,7 @@ subject = "magenta"
         );
 
         let subject_col = layout.name_width + 1 + layout.hash_width + 1;
-        assert_eq!(
-            short.chars().skip(subject_col).collect::<String>(),
-            "init"
-        );
+        assert_eq!(short.chars().skip(subject_col).collect::<String>(), "init");
         assert_eq!(long.chars().skip(subject_col).collect::<String>(), "wip");
     }
 
